@@ -10,8 +10,8 @@ class IndexView(TemplateView):
     template_name = 'main/base.html'
 
 
-    def get_context_date(self, **kwargs):
-        context = super().get_context_date(**kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         context['current_category'] = None
         return context
@@ -24,7 +24,7 @@ class IndexView(TemplateView):
     
 
 class CatalogView(TemplateView):
-    template = 'main/base.html'
+    template_name = 'main/base.html'
 
     FILTER_MAPPING = {
         'color': lambda queryset, value: queryset.filter(color__iexact=value),
@@ -34,7 +34,7 @@ class CatalogView(TemplateView):
     }
 
 
-    def context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         category_slug = kwargs.get('category_slug')
         categories = Category.objects.all()
@@ -53,7 +53,7 @@ class CatalogView(TemplateView):
         
         filter_params = {}
 
-        for param, filter_func in self.FILTER_MAPPING.item():
+        for param, filter_func in self.FILTER_MAPPING.items():
             value = self.request.GET.get(param)
             if value:
                 products = filter_func(products, value)
@@ -95,9 +95,9 @@ class CatalogView(TemplateView):
 
 class ProductDetailView(DetailView):
     model = Product
-    template_name = 'main/base.heml'
+    template_name = 'main/base.html'
     slug_field = 'slug'
-    slug_url_kwags = 'slug'
+    slug_url_kwarg = 'slug'
 
     
     def get_context_date(self, **kwargs):
@@ -116,5 +116,5 @@ class ProductDetailView(DetailView):
         context = self.get_context_data(**kwargs)
         if request.headers.get('HX-Request'):
             return TemplateResponse(request, 'main/product_detail.html', context)
-        raise TemplateResponse(request, self.template_name, context)
+        return TemplateResponse(request, self.template_name, context)
     
