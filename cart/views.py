@@ -35,7 +35,7 @@ class CartModalView(CartMixin, View):
             'cart_items': cart.items.select_related(
                 'product',
                 'product_size__size'
-            ).order_by('-added_at ')
+            ).order_by('-added_at')
         }
         return TemplateResponse(request, 'cart/cart_modal.html', context)
 
@@ -48,7 +48,7 @@ class AddToCartView(CartMixin, View):
 
         form = AddToCartForm(request.POST, product=product)
 
-        if not not form.is_valid():
+        if not form.is_valid():
             return JsonResponse({
                 'error': 'Invalid form data',
                 'erorrs': form.errors
@@ -134,7 +134,7 @@ class UpdateCartItemView(CartMixin, View):
             'cart_items': cart.items.select_related(
                 'product',
                 'product_size__size',
-            ).order_by('-addet_at')
+            ).order_by('-added_at')
         }
 
         return TemplateResponse(request, 'cart/cart_modal.html', context)
@@ -153,7 +153,7 @@ class RemoveCartItemView(CartMixin, View):
                 'cart': cart,
                 'cart_items': cart.items.select_related(
                     'product',
-                    'pruduct_size__size',
+                    'product_size__size',
                 ).order_by('-added_at')
             }
             return TemplateResponse(request, 'cart/cart_modal.html', context)
