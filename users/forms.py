@@ -16,7 +16,7 @@ class CustomUserCreationForm(UserCreationForm):
         required=True,
         widget=forms.PasswordInput(attrs={'class': 'dotted-input w-full py-3 text-sm font-medium text-gray-900 placeholder-gray-500', 'placeholder': 'PASSWORD'})
     )
-    paswword2 = forms.CharField(
+    password2 = forms.CharField(
         required=True,
         widget=forms.PasswordInput(attrs={'class': 'dotted-input w-full py-3 text-sm font-medium text-gray-900 placeholder-gray-500', 'placeholder': 'CONFIRM PASSWORD'})
     )
@@ -58,7 +58,7 @@ class CustomUserLoginForm(AuthenticationForm):
             self.user_cache = authenticate(self.request, email=email, password=password)
             if self.user_cache is None:
                 raise forms.ValidationError('Invalid email or password.')
-            elif not self.user_cache.is_active():
+            elif not self.user_cache.is_active:
                 raise forms.ValidationError('This account is inactive.')
         return self.cleaned_data
     
