@@ -20,7 +20,7 @@ stripe_endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
 
 
 def create_stripe_checkout_session(order, request):
-    cart = CartMixin.get_cart(request)
+    cart = CartMixin().get_cart(request)
     line_items = []
     for item in cart.items.select_related('product', 'product_size'):
         line_items.append({
@@ -29,12 +29,12 @@ def create_stripe_checkout_session(order, request):
                 'product_data': {
                     'name': f'{item.product.name} - {item.product_size.size.name}',
                 },
-                'unit_amount': int(item.product.size * 100), 
+                'unit_amount': int(item.product.price * 100), 
             },
             'quantity': item.quantity,
         })
     try:
-        chechkout_session = stripe.checkout.Session.create(
+        checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=line_items,
             mode='payment',
@@ -44,10 +44,10 @@ def create_stripe_checkout_session(order, request):
                 'order_id': order.id,
             }
         )
-        order.stripe_payment_intent_id = chechkout_session.payment_intent
+        order.stripe_payment_intent_id = checkout_session.payment_intent
         order.payment_provider = 'stripe'
         order.save()
-        return chechkout_session
+        return checkout_session
     except Exception as e:
         raise 
 
@@ -70,11 +70,11 @@ def stripe_webhook(request):
     
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        order_id = session['metadata'].get('order_id')
+        order_id = session.metadata["order_id"]
         try:
             order = Order.objects.get(id=order_id)
             order.status = 'processing'
-            order.stripe_payment_intend_id = session.get('payment_intent')
+            order.stripe_payment_intent_id = session['payment_intent']
             order.save()
         except Order.DoesNotExist:
             return HttpResponse(status=400)
@@ -87,7 +87,7 @@ def stripe_success(request):
     if session_id:
         try:
             session = stripe.checkout.Session.retrieve(session_id)
-            order_id = session.metadata.get('order_id')
+            order_id = session.metadata["order_id"]
             order = get_object_or_404(Order, id=order_id)
             
             cart = CartMixin().get_cart(request)
