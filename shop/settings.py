@@ -34,8 +34,8 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'domain.com', 'www.domain.com']
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://localhost:8000',
-    'http://domain.com:8000',
-    'http://www.domain.com:8000',
+    'https://domain.com:8000',
+    'https://www.domain.com:8000',
 ]
 
 CSRF_COOKIE_SECURE = True
